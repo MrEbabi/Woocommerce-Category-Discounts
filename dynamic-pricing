@@ -1,0 +1,41 @@
+//dynamic regular price function
+add_filter( 'woocommerce_product_get_regular_price', 'custom_dynamic_regular_price', 10, 2 );
+add_filter( 'woocommerce_product_variation_get_regular_price', 'custom_dynamic_regular_price', 10, 2 );
+function custom_dynamic_regular_price( $regular_price, $product ) {
+    if( empty($regular_price) || $regular_price == 0 )
+        return $product->get_price();
+    else
+        return $regular_price;
+}
+
+// dynamic sale price function - you will make your discounts based on categories here
+add_filter( 'woocommerce_product_get_sale_price', 'custom_dynamic_sale_price', 10, 2 );
+add_filter( 'woocommerce_product_variation_get_sale_price', 'custom_dynamic_sale_price', 10, 2 );
+function custom_dynamic_sale_price( $sale_price, $product ) {
+    //get categories of woocommerce
+    $categories = wp_get_post_terms($product->id, 'product_cat');    
+    $categories = wp_list_pluck($categories, 'name');
+    //set discounts rates for category 1, 2 and 3 respectively
+    $rate1 = 0.85;
+	  $rate2 = 0.9;
+	  $rate3 = 0.95;
+		if( (empty($sale_price) || $sale_price == 0) && (in_array("Example Category 1", $categories)) )
+        	return $product->get_regular_price() * $rate1 ;
+		elseif( (empty($sale_price) || $sale_price == 0) && (in_array("Example Category 2", $categories)) )
+			return $product->get_regular_price() * $rate2 ;
+		elseif( (empty($sale_price) || $sale_price == 0) && (in_array("Example Category 3", $categories)) )
+			return $product->get_regular_price() * $rate3 ;
+		else return;
+};
+
+//show regular prices and sale prices 
+add_filter( 'woocommerce_get_price_html', 'custom_dynamic_sale_price_html', 20, 2 );
+function custom_dynamic_sale_price_html( $price_html, $product ) {
+    if( $product->is_type('variable') ) return $price_html;
+	if($product->is_on_sale())
+	{
+		$price_html = wc_format_sale_price( wc_get_price_to_display( $product, array( 'price' => $product->get_regular_price() ) ), wc_get_price_to_display(  $product, array( 'price' => $product->get_sale_price() ) ) ) . $product->get_price_suffix();
+	}
+
+    return $price_html;
+}
