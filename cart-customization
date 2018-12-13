@@ -1,0 +1,30 @@
+//a helper function to ensure that dynamic pricing is working compatible with your theme
+
+add_action( 'woocommerce_before_calculate_totals', 'set_cart_item_sale_price', 20, 1 );
+function set_cart_item_sale_price( $cart ) {
+    if ( is_admin() && ! defined( 'DOING_AJAX' ) )
+        return;
+   
+        foreach( $cart->get_cart() as $cart_item ) {
+		if($cart_item['data']->get_sale_price() <= $cart_item['data']->get_regular_price() && $cart_item['data']->get_sale_price() > 0)
+		{
+			$price = $cart_item['data']->get_sale_price(); // get sale price
+			$cart_item['data']->set_price( $price ); // Set the sale price
+		}
+		else
+		{
+			$price = $cart_item['data']->get_regular_price();
+			$cart_item['data']->set_price( $price );
+		}
+    }
+    /*the function named generateCoupon() is another code that programmatically generates a coupon based on cart products 
+     *with this function you can generate a dynamic coupon
+     *example: 
+     * coupon name: testcoupon
+     * amount: will be calculated for every cart click
+     * assume you have 15% discount for products in category A, so sale prices are calculated for those products
+     * and you have 10% discount for products in category B, so sale prices are also calculated for those products 
+     * and you have some other categories or products with no discounts
+     * but you also want that some special customers to use a coupon with 25% discount from the regular price of all products
+    //generateCoupon();
+}
