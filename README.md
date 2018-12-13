@@ -1,4 +1,4 @@
-Check "dynamic pricing" and "cart customization" codes.
+Kindly check the "dynamic pricing" and "cart customization" codes.
 
 Dynamic pricing code help you to make different discounts based on categories, you will not need any plugins.
 
